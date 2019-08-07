@@ -3,6 +3,7 @@ package its_meow.bettertridentreturn;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.TridentItem;
 import net.minecraft.nbt.CompoundNBT;
@@ -31,7 +32,7 @@ public class BetterTridentReturnMod {
                         if(newStack.getTag() == null) {
                             newStack.setTag(new CompoundNBT());
                         }
-                        int slot = player.inventory.getSlotFor(event.getItem());
+                        int slot = getSlotFor(player.inventory, event.getItem());
                         newStack.getTag().putInt("slot_thrown_from", slot);
                     }
                 }
@@ -53,7 +54,7 @@ public class BetterTridentReturnMod {
                 if(stack.getTag().contains("slot_thrown_from", NBT.TAG_INT)) {
                     int slot = stack.getTag().getInt("slot_thrown_from");
                     stack.getTag().remove("slot_thrown_from");
-                    int curSlot = player.inventory.getSlotFor(stack);
+                    int curSlot = getSlotFor(player.inventory, stack);
                     if(slot != curSlot) {
                         if(slot == -1) {
                             ItemStack fromSlot = player.getHeldItemOffhand();
@@ -72,6 +73,20 @@ public class BetterTridentReturnMod {
                 }
             }
         }
+    }
+
+    public static int getSlotFor(PlayerInventory inv, ItemStack stack) {
+        for(int i = 0; i < inv.mainInventory.size(); ++i) {
+            if (!inv.mainInventory.get(i).isEmpty() && stackEqualExact(stack, inv.mainInventory.get(i))) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    private static boolean stackEqualExact(ItemStack stack1, ItemStack stack2) {
+        return stack1.getItem() == stack2.getItem() && ItemStack.areItemStackTagsEqual(stack1, stack2);
     }
 
 }
