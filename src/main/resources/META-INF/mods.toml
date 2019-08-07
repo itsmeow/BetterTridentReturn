@@ -1,0 +1,14 @@
+modLoader="javafml" #mandatory
+loaderVersion="[24,)" #mandatory (24 is current forge version)
+issueTrackerURL="http://github.com/itsmeow/BetterTridentReturn/issues" #optional
+displayURL="https://minecraft.curseforge.com/projects/bettertridentreturn" #optional
+logoFile="bettertridentreturn.png" #optional
+credits="its_meow: everything" #optional
+authors="its_meow" #optional
+[[mods]] #mandatory
+modId="bettertridentreturn" #mandatory
+version="${file.jarVersion}" #mandatory
+displayName="Better Trident Return" #mandatory
+# The description text for the mod (multi line!) (#mandatory)
+description='''
+Makes the Loyalty enchantment return the trident to the slot it left rather than just the first available slot.'''
