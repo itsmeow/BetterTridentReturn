@@ -17,7 +17,6 @@ import net.minecraftforge.fml.common.Mod;
 public class BetterTridentReturnMod {
 
     public static final String MOD_ID = "bettertridentreturn";
-    public static final String VERSION = "@VERSION@";
 
     @SubscribeEvent
     public static void onItemThrown(LivingEntityUseItemEvent.Stop event) {
@@ -34,7 +33,6 @@ public class BetterTridentReturnMod {
                         }
                         int slot = player.inventory.getSlotFor(event.getItem());
                         newStack.getTag().putInt("slot_thrown_from", slot);
-                        System.out.println(slot);
                     }
                 }
             }
@@ -58,14 +56,12 @@ public class BetterTridentReturnMod {
                     int curSlot = player.inventory.getSlotFor(stack);
                     if(slot != curSlot) {
                         if(slot == -1) {
-                            System.out.println(slot);
                             ItemStack fromSlot = player.getHeldItemOffhand();
                             if(fromSlot == null || fromSlot.isEmpty()) {
                                 player.inventory.removeStackFromSlot(curSlot);
                                 player.inventory.offHandInventory.set(0, stack);
                             }
                         } else {
-                            System.out.println(slot);
                             ItemStack fromSlot = player.inventory.getStackInSlot(slot);
                             if(fromSlot == null || fromSlot.isEmpty()) {
                                 player.inventory.removeStackFromSlot(curSlot);
