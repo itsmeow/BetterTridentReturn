@@ -1,7 +1,7 @@
 modLoader="javafml" #mandatory
-loaderVersion="[24,)" #mandatory (24 is current forge version)
+loaderVersion="[28,)" #mandatory
 issueTrackerURL="http://github.com/itsmeow/BetterTridentReturn/issues" #optional
-displayURL="https://minecraft.curseforge.com/projects/bettertridentreturn" #optional
+displayURL="https://www.curseforge.com/minecraft/mc-mods/bettertridentreturn" #optional
 logoFile="bettertridentreturn.png" #optional
 credits="its_meow: everything" #optional
 authors="its_meow" #optional

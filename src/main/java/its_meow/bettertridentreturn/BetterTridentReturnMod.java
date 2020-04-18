@@ -13,7 +13,7 @@ import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = BetterTridentReturnMod.MOD_ID)//, bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = BetterTridentReturnMod.MOD_ID)
 @Mod(value = BetterTridentReturnMod.MOD_ID)
 public class BetterTridentReturnMod {
 
@@ -32,6 +32,7 @@ public class BetterTridentReturnMod {
                         if(newStack.getTag() == null) {
                             newStack.setTag(new CompoundNBT());
                         }
+                        newStack.getTag().putInt("slot_thrown_from", -3); // unique identifier
                         int slot = getSlotFor(player.inventory, event.getItem());
                         newStack.getTag().putInt("slot_thrown_from", slot);
                     }
@@ -53,19 +54,20 @@ public class BetterTridentReturnMod {
             if(stack.getTag() != null) {
                 if(stack.getTag().contains("slot_thrown_from", NBT.TAG_INT)) {
                     int slot = stack.getTag().getInt("slot_thrown_from");
-                    stack.getTag().remove("slot_thrown_from");
                     int curSlot = getSlotFor(player.inventory, stack);
                     if(slot != curSlot) {
                         if(slot == -1) {
                             ItemStack fromSlot = player.getHeldItemOffhand();
                             if(fromSlot == null || fromSlot.isEmpty()) {
                                 player.inventory.removeStackFromSlot(curSlot);
+                                stack.getTag().remove("slot_thrown_from");
                                 player.inventory.offHandInventory.set(0, stack);
                             }
-                        } else {
+                        } else if(slot != -2) {
                             ItemStack fromSlot = player.inventory.getStackInSlot(slot);
                             if(fromSlot == null || fromSlot.isEmpty()) {
                                 player.inventory.removeStackFromSlot(curSlot);
+                                stack.getTag().remove("slot_thrown_from");
                                 player.inventory.setInventorySlotContents(slot, stack);
                             }
                         }
@@ -81,8 +83,12 @@ public class BetterTridentReturnMod {
                 return i;
             }
         }
+        if(!inv.offHandInventory.get(0).isEmpty() && stackEqualExact(stack, inv.offHandInventory.get(0))) {
+            return -1;
+        }
 
-        return -1;
+
+        return -2;
     }
 
     private static boolean stackEqualExact(ItemStack stack1, ItemStack stack2) {
