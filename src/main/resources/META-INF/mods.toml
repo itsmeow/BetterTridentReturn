@@ -1,5 +1,5 @@
 modLoader="javafml" #mandatory
-loaderVersion="[28,)" #mandatory
+loaderVersion="[31,)" #mandatory
 issueTrackerURL="http://github.com/itsmeow/BetterTridentReturn/issues" #optional
 displayURL="https://www.curseforge.com/minecraft/mc-mods/bettertridentreturn" #optional
 logoFile="bettertridentreturn.png" #optional
