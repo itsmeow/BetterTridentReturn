@@ -11,13 +11,21 @@ import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ExtensionPoint;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.network.FMLNetworkConstants;
+import org.apache.commons.lang3.tuple.Pair;
 
 @Mod.EventBusSubscriber(modid = BetterTridentReturnMod.MOD_ID)
 @Mod(value = BetterTridentReturnMod.MOD_ID)
 public class BetterTridentReturnMod {
 
     public static final String MOD_ID = "bettertridentreturn";
+
+    public BetterTridentReturnMod() {
+        ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST, () -> Pair.of(() -> FMLNetworkConstants.IGNORESERVERONLY, (a, b) -> true));
+    }
 
     @SubscribeEvent
     public static void onItemThrown(LivingEntityUseItemEvent.Stop event) {
