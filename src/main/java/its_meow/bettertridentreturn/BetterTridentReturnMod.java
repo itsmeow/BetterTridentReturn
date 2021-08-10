@@ -1,47 +1,49 @@
 package its_meow.bettertridentreturn;
 
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.TridentItem;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TridentItem;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ExtensionPoint;
+import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.network.FMLNetworkConstants;
-import org.apache.commons.lang3.tuple.Pair;
+import net.minecraftforge.fmllegacy.network.FMLNetworkConstants;
 
 @Mod.EventBusSubscriber(modid = BetterTridentReturnMod.MOD_ID)
 @Mod(value = BetterTridentReturnMod.MOD_ID)
 public class BetterTridentReturnMod {
 
     public static final String MOD_ID = "bettertridentreturn";
+    private static final int OFFHAND_SLOT = -1;
+    private static final int NOT_FOUND_SLOT = -2;
+    private static final int SEARCH_ID_SLOT = -3;
 
     public BetterTridentReturnMod() {
-        ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST, () -> Pair.of(() -> FMLNetworkConstants.IGNORESERVERONLY, (a, b) -> true));
+        ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> FMLNetworkConstants.IGNORESERVERONLY, (a, b) -> true));
     }
 
     @SubscribeEvent
     public static void onItemThrown(LivingEntityUseItemEvent.Stop event) {
-        if(event.getEntity() instanceof PlayerEntity) {
-            PlayerEntity player = (PlayerEntity) event.getEntity();
-            if(event.getItem().getItem() instanceof TridentItem && EnchantmentHelper.getEnchantmentLevel(Enchantments.LOYALTY, event.getItem()) > 0) {
+        if(event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            if(event.getItem().getItem() instanceof TridentItem && EnchantmentHelper.getItemEnchantmentLevel(Enchantments.LOYALTY, event.getItem()) > 0) {
                 int i = 72000 - event.getDuration();
                 if (i >= 10) {
-                    int j = EnchantmentHelper.getRiptideModifier(event.getItem());
-                    if (j <= 0 || player.isWet()) {
+                    int j = EnchantmentHelper.getRiptide(event.getItem());
+                    if (j <= 0 || player.isInWaterOrRain()) {
                         ItemStack newStack = event.getItem();
                         if(newStack.getTag() == null) {
-                            newStack.setTag(new CompoundNBT());
+                            newStack.setTag(new CompoundTag());
                         }
-                        newStack.getTag().putInt("slot_thrown_from", -3); // unique identifier
-                        int slot = getSlotFor(player.inventory, event.getItem());
+                        newStack.getTag().putInt("slot_thrown_from", SEARCH_ID_SLOT); // unique identifier
+                        int slot = getSlotFor(player.getInventory(), event.getItem());
                         newStack.getTag().putInt("slot_thrown_from", slot);
                     }
                 }
@@ -51,32 +53,32 @@ public class BetterTridentReturnMod {
 
     @SubscribeEvent
     public static void onItemPickup(PlayerTickEvent event) {
-        PlayerEntity player = event.player;
-        for(ItemStack stack : player.inventory.mainInventory) {
+        Player player = event.player;
+        for(ItemStack stack : player.getInventory().items) {
             checkStack(player, stack);
         }
     }
 
-    public static void checkStack(PlayerEntity player, ItemStack stack) {
-        if(stack.getItem() instanceof TridentItem && EnchantmentHelper.getEnchantmentLevel(Enchantments.LOYALTY, stack) > 0) {
+    public static void checkStack(Player player, ItemStack stack) {
+        if(stack.getItem() instanceof TridentItem && EnchantmentHelper.getItemEnchantmentLevel(Enchantments.LOYALTY, stack) > 0) {
             if(stack.getTag() != null) {
                 if(stack.getTag().contains("slot_thrown_from", NBT.TAG_INT)) {
                     int slot = stack.getTag().getInt("slot_thrown_from");
-                    int curSlot = getSlotFor(player.inventory, stack);
+                    int curSlot = getSlotFor(player.getInventory(), stack);
                     if(slot != curSlot) {
-                        if(slot == -1) {
-                            ItemStack fromSlot = player.getHeldItemOffhand();
+                        if(slot == OFFHAND_SLOT) {
+                            ItemStack fromSlot = player.getOffhandItem();
                             if(fromSlot == null || fromSlot.isEmpty()) {
-                                player.inventory.removeStackFromSlot(curSlot);
+                                player.getInventory().removeItemNoUpdate(curSlot);
                                 stack.getTag().remove("slot_thrown_from");
-                                player.inventory.offHandInventory.set(0, stack);
+                                player.getInventory().offhand.set(0, stack);
                             }
-                        } else if(slot != -2) {
-                            ItemStack fromSlot = player.inventory.getStackInSlot(slot);
+                        } else if(slot != NOT_FOUND_SLOT) {
+                            ItemStack fromSlot = player.getInventory().getItem(slot);
                             if(fromSlot == null || fromSlot.isEmpty()) {
-                                player.inventory.removeStackFromSlot(curSlot);
+                                player.getInventory().removeItemNoUpdate(curSlot);
                                 stack.getTag().remove("slot_thrown_from");
-                                player.inventory.setInventorySlotContents(slot, stack);
+                                player.getInventory().setItem(slot, stack);
                             }
                         }
                     }
@@ -85,22 +87,22 @@ public class BetterTridentReturnMod {
         }
     }
 
-    public static int getSlotFor(PlayerInventory inv, ItemStack stack) {
-        for(int i = 0; i < inv.mainInventory.size(); ++i) {
-            if (!inv.mainInventory.get(i).isEmpty() && stackEqualExact(stack, inv.mainInventory.get(i))) {
+    public static int getSlotFor(Inventory inv, ItemStack stack) {
+        for(int i = 0; i < inv.items.size(); ++i) {
+            if (!inv.items.get(i).isEmpty() && stackEqualExact(stack, inv.items.get(i))) {
                 return i;
             }
         }
-        if(!inv.offHandInventory.get(0).isEmpty() && stackEqualExact(stack, inv.offHandInventory.get(0))) {
-            return -1;
+        if(!inv.offhand.get(0).isEmpty() && stackEqualExact(stack, inv.offhand.get(0))) {
+            return OFFHAND_SLOT;
         }
 
 
-        return -2;
+        return NOT_FOUND_SLOT;
     }
 
     private static boolean stackEqualExact(ItemStack stack1, ItemStack stack2) {
-        return stack1.getItem() == stack2.getItem() && ItemStack.areItemStackTagsEqual(stack1, stack2);
+        return stack1.getItem() == stack2.getItem() && ItemStack.tagMatches(stack1, stack2);
     }
 
 }
