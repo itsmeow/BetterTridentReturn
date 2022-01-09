@@ -1,0 +1,20 @@
+modLoader="javafml"
+loaderVersion="[39,)"
+license="MIT"
+issueTrackerURL="https://github.com/itsmeow/BetterTridentReturn/issues"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/bettertridentreturn"
+logoFile="bettertridentreturn.png"
+credits="itsmeowdev, for programming, ideas, design, and leading"
+authors="itsmeowdev"
+[[mods]]
+modId="bettertridentreturn"
+version="${version}"
+displayName="Better Trident Return"
+description='''
+Makes the Loyalty enchantment return the trident to the slot it left rather than just the first available slot.'''
+[[dependencies.bettertridentreturn]]
+    modId="forge"
+    mandatory=true
+    versionRange="[39.0.0,)"
+    ordering="NONE"
+    side="SERVER"
