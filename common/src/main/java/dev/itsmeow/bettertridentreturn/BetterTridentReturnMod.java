@@ -18,7 +18,7 @@ public class BetterTridentReturnMod {
     public static void onItemUseFinish(Player player, ItemStack itemStack, int duration) {
         if (itemStack.getItem() instanceof TridentItem && EnchantmentHelper.getItemEnchantmentLevel(Enchantments.LOYALTY, itemStack) > 0 && itemStack.getItem().getUseDuration(itemStack) - duration >= 10) {
             int j = EnchantmentHelper.getRiptide(itemStack);
-            if ((j <= 0 || player.isInWaterOrRain()) && !player.getLevel().isClientSide() && j == 0) {
+            if ((j <= 0 || player.isInWaterOrRain()) && !player.level().isClientSide() && j == 0) {
                 if (itemStack.getTag() == null) {
                     itemStack.setTag(new CompoundTag());
                 }
@@ -43,14 +43,14 @@ public class BetterTridentReturnMod {
                     if(slot != curSlot) {
                         if(slot == OFFHAND_SLOT) {
                             ItemStack fromSlot = player.getOffhandItem();
-                            if(fromSlot == null || fromSlot.isEmpty()) {
+                            if(fromSlot.isEmpty()) {
                                 player.getInventory().removeItemNoUpdate(curSlot);
                                 stack.getTag().remove("slot_thrown_from");
                                 player.getInventory().offhand.set(0, stack);
                             }
                         } else if(slot != NOT_FOUND_SLOT) {
                             ItemStack fromSlot = player.getInventory().getItem(slot);
-                            if(fromSlot == null || fromSlot.isEmpty()) {
+                            if(fromSlot.isEmpty()) {
                                 player.getInventory().removeItemNoUpdate(curSlot);
                                 stack.getTag().remove("slot_thrown_from");
                                 player.getInventory().setItem(slot, stack);
@@ -77,7 +77,7 @@ public class BetterTridentReturnMod {
     }
 
     private static boolean stackEqualExact(ItemStack stack1, ItemStack stack2) {
-        return stack1.getItem() == stack2.getItem() && ItemStack.tagMatches(stack1, stack2);
+        return stack1.getItem() == stack2.getItem() && ItemStack.matches(stack1, stack2);
     }
 
 }
