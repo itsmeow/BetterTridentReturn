@@ -1,21 +1,13 @@
 package dev.itsmeow.bettertridentreturn;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.architectury.injectables.annotations.ExpectPlatform;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.core.component.DataComponentType;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TridentItem;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
 
 public class BetterTridentReturnMod {
 
@@ -55,7 +47,7 @@ public class BetterTridentReturnMod {
     }
 
     public static void onPlayerTick(Player player) {
-        for(ItemStack stack : player.getInventory().getNonEquipmentItems()) {
+        for(ItemStack stack : player.getInventory().items) {
             checkStack(player, stack);
         }
     }
@@ -93,12 +85,15 @@ public class BetterTridentReturnMod {
                     player.getInventory().setItem(slot, stack);
                 }
             }
+        } else {
+            // Already in correct slot
+            stack.remove(getTridentReturnDataType());
         }
     }
 
     public static int getSlotFor(Inventory inv, ItemStack stack) {
-        for(int i = 0; i < inv.getNonEquipmentItems().size(); ++i) {
-            if (!inv.getNonEquipmentItems().get(i).isEmpty() && stackEqualExact(stack, inv.getNonEquipmentItems().get(i))) {
+        for(int i = 0; i < inv.items.size(); ++i) {
+            if (!inv.items.get(i).isEmpty() && stackEqualExact(stack, inv.items.get(i))) {
                 return i;
             }
         }

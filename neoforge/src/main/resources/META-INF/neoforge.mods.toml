@@ -16,13 +16,13 @@ issueTrackerURL="https://github.com/itsmeow/BetterTridentReturn/issues"
 [[dependencies.bettertridentreturn]]
     modId="neoforge"
     type="required"
-    versionRange="[21.5.0,)"
+    versionRange="[21.1.0,)"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.bettertridentreturn]]
     modId="minecraft"
     type="required"
-    versionRange="1.21.5"
+    versionRange="1.21.1"
     ordering="NONE"
     side="BOTH"
